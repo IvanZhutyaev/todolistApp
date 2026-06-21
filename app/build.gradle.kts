@@ -3,15 +3,13 @@ plugins {
 }
 
 android {
-    namespace = "com.example.todolistapp"
+    namespace = "com.example.myapplicationtodo"
     compileSdk {
-        version = release(36) {
-            minorApiLevel = 1
-        }
+        version = release(36)
     }
 
     defaultConfig {
-        applicationId = "com.example.todolistapp"
+        applicationId = "com.example.myapplicationtodo"
         minSdk = 33
         targetSdk = 36
         versionCode = 1
@@ -29,7 +27,9 @@ android {
             )
         }
     }
-    buildFeatures { viewBinding = true }
+    buildFeatures{
+        viewBinding  = true
+    }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
