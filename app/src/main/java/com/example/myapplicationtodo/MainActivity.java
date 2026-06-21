@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.os.Bundle;
 import android.text.InputType;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
@@ -24,6 +25,8 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
     private TaskAdapter adapter;
+    private final List<Task> historyTasks = new ArrayList<>();
+
     private final List<Task> tasks = new ArrayList<>();
 
     @Override
@@ -31,14 +34,45 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        adapter = new TaskAdapter(tasks);
+        adapter = new TaskAdapter(tasks, historyTasks);
         binding.rvTasks.setLayoutManager(new LinearLayoutManager(this));
         binding.rvTasks.setAdapter(adapter);
-        binding.addTask.setOnClickListener(v -> showAddDialog());
+        binding.addTask.setOnClickListener(v->showAddDialog());
+        binding.historyTask.setOnClickListener(v -> showHistory());
 
         initSwipeDelete();
 
     }
+
+    private void showHistory() {
+        if (historyTasks.isEmpty()){
+            new AlertDialog.Builder(this)
+                    .setTitle("History")
+                    .setMessage("EMPTY")
+                    .setPositiveButton("OK", null)
+                    .show();
+            return;
+        }
+        StringBuilder sb = new StringBuilder();
+        for (Task task:historyTasks){
+            sb.append("Task ").append(task.getText()).append(" complete").append("\n");
+        }
+
+        TextView textView = new TextView(this);
+        textView.setText(sb.toString().trim());
+        textView.setPadding(40,20,40,20);
+        textView.setTextSize(16);
+        new AlertDialog.Builder(this)
+                .setTitle("History")
+                .setView(textView)
+                .setPositiveButton("Clear History",(dialog, which)->{
+                    historyTasks.clear();
+                    adapter.notifyDataSetChanged();
+                })
+                .setNegativeButton("Close", null).show();
+    }
+
+
 
     private void showAddDialog() {
         EditText input = new EditText(this);

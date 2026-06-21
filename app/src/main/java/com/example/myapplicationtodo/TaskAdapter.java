@@ -14,9 +14,11 @@ import java.util.List;
 
 public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder> {
     private final List<Task> tasks;
+    private final List<Task> historyTasks;
 
-    public TaskAdapter(List<Task> tasks) {
+    public TaskAdapter(List<Task> tasks, List<Task> historyTasks) {
         this.tasks = tasks;
+        this.historyTasks = historyTasks;
     }
 
     @NonNull
@@ -38,6 +40,18 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         holder.checkDone.setOnCheckedChangeListener(((buttonView, isChecked) -> {
             task.setDone(isChecked);
             applyStrike(holder.textTask, isChecked);
+
+            if(isChecked){
+                historyTasks.add(0,task);
+                int pos = holder.getAdapterPosition();
+                tasks.remove(pos);
+                notifyItemRemoved(pos);
+            }
+            else {
+                historyTasks.remove(task);
+                int pos = holder.getAdapterPosition();
+                notifyItemChanged(pos);
+            }
         }));
     }
 
@@ -57,12 +71,20 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
     }
 
     public void removeTask(int position) {
+        Task task = tasks.get(position);
+        if (task.getDone()){
+            historyTasks.remove(task);
+        }
         tasks.remove(position);
         notifyItemRemoved(position);
     }
 
     public void restoreTask(Task task, int position) {
-        tasks.add(position, task);
+        tasks.add(position,task);
+
+        if(task.getDone()){
+            historyTasks.add(0,task);
+        }
         notifyItemInserted(position);
     }
 
