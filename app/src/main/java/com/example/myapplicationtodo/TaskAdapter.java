@@ -53,6 +53,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
 
     public void addTask(String text) {
         tasks.add(0, new Task(text, false));
+        notifyItemInserted(0);
     }
 
     public void removeTask(int position) {
