@@ -55,7 +55,14 @@ public class MainActivity extends AppCompatActivity {
         }
         StringBuilder sb = new StringBuilder();
         for (Task task:historyTasks){
-            sb.append("Task ").append(task.getText()).append(" complete").append("\n");
+            String reason = "";
+            if("done".equals(task.getHistoryReason())){
+                reason = " Complete";
+
+            }else if("deleted".equals(task.getHistoryReason())){
+                reason=" Deleted";
+            }
+            sb.append("Task ").append(task.getText()).append(reason).append("\n");
         }
 
         TextView textView = new TextView(this);

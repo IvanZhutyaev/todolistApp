@@ -4,9 +4,16 @@ public class Task {
     String text;
     Boolean done;
 
+    public void setHistoryReason(String historyReason) {
+        this.historyReason = historyReason;
+    }
+
+    String historyReason;
+
     public Task(String text, Boolean done) {
         this.text = text;
         this.done = done;
+        this.historyReason=null;
     }
 
     public String getText() {
@@ -23,5 +30,9 @@ public class Task {
 
     public void setDone(Boolean done) {
         this.done = done;
+    }
+
+    public String getHistoryReason(){
+        return historyReason;
     }
 }

@@ -22,37 +22,39 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
     }
 
     @NonNull
-    @Override
     public TaskViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.task_item, parent, false);
         return new TaskViewHolder(view);
     }
 
-    @Override
     public void onBindViewHolder(@NonNull TaskViewHolder holder, int position) {
         Task task = tasks.get(position);
-
         holder.textTask.setText(task.getText());
+
         holder.checkDone.setOnCheckedChangeListener(null);
         holder.checkDone.setChecked(task.getDone());
         applyStrike(holder.textTask, task.getDone());
 
-        holder.checkDone.setOnCheckedChangeListener(((buttonView, isChecked) -> {
+        holder.checkDone.setOnCheckedChangeListener((buttonView, isChecked) -> {
             task.setDone(isChecked);
             applyStrike(holder.textTask, isChecked);
 
-            if(isChecked){
-                historyTasks.add(0,task);
+            if (isChecked) {
+                task.setHistoryReason("done");
+                if (!historyTasks.contains(task)) {
+                    historyTasks.add(0, task);
+                }
                 int pos = holder.getAdapterPosition();
-                tasks.remove(pos);
-                notifyItemRemoved(pos);
-            }
-            else {
+                if (pos != RecyclerView.NO_POSITION) {
+                    tasks.remove(pos);
+                    notifyItemRemoved(pos);
+                }
+            } else {
+                task.setHistoryReason(null);
                 historyTasks.remove(task);
-                int pos = holder.getAdapterPosition();
-                notifyItemChanged(pos);
+                notifyItemChanged(holder.getAdapterPosition());
             }
-        }));
+        });
     }
 
     private void applyStrike(TextView textTask, Boolean done) {
@@ -72,19 +74,18 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
 
     public void removeTask(int position) {
         Task task = tasks.get(position);
-        if (task.getDone()){
-            historyTasks.remove(task);
+        task.setHistoryReason("deleted");
+        if (!historyTasks.contains(task)) {
+            historyTasks.add(0, task);
         }
         tasks.remove(position);
         notifyItemRemoved(position);
     }
 
     public void restoreTask(Task task, int position) {
-        tasks.add(position,task);
-
-        if(task.getDone()){
-            historyTasks.add(0,task);
-        }
+        task.setHistoryReason(null);
+        historyTasks.remove(task);
+        tasks.add(position, task);
         notifyItemInserted(position);
     }
 
@@ -92,7 +93,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         return tasks.get(position);
     }
 
-    @Override
+
     public int getItemCount() {
         return tasks.size();
     }
